@@ -1,0 +1,63 @@
+---
+title: "EDS 222 Week 1 Wednesday"
+subtitle: "Sampling"
+format: html
+---
+
+We're going to see how to sample from both *empirical* and *parametric* distributions in R. This is the foundation for *simulations*, which is the most important tool in this course.
+
+## Empirical Distributions
+
+```{r}
+library(tidyverse)
+set.seed(222)
+theme_set(theme_bw())
+
+soil_cores <- read_csv("/courses/EDS222/data/exide-soil-cores.csv")
+```
+
+`sample()` draws sample from a vector (e.g. a column in a data frame).
+
+```{r}
+pb_ppm_sample <- sample(soil_cores$pb_ppm, size = 50)
+
+# Visualize the whole distribution
+ggplot(soil_cores, aes(pb_ppm)) +
+  geom_histogram(binwidth = 20) +
+  xlim(0, 1000)
+
+# visualize just our sample
+tibble(pb_ppm = pb_ppm_sample) |>
+  ggplot(aes(pb_ppm)) +
+  geom_histogram(binwidth = 50)
+```
+
+`slice_sample()` draws sample from a data frame.
+
+```{r}
+soil_sample <- soil_cores |>
+  slice_sample(n = 50)
+ggplot(soil_sample, aes(pb_ppm)) +
+  geom_histogram(binwidth = 50)
+```
+
+## Parametric distributions
+
+Visualize the PDF with `dnorm()` and other `d___()` functions. 
+
+```{r}
+tibble(
+  x = seq(-860, 1370, length.out = 1000),
+  pdf = dnorm(x, mean = 254, sd = 371)
+) |>
+  ggplot(aes(x, pdf)) +
+  geom_line(linewidth = 1.5)
+```
+
+Draw samples with `rnorm()`.
+
+```{r}
+normal_sample <- tibble(x = rnorm(25, mean = 254, sd = 371))
+ggplot(normal_sample, aes(x)) +
+  geom_histogram(binwidth = 100)
+```
